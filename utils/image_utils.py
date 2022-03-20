@@ -1,10 +1,49 @@
 import numpy as np
-import cv2
+from enum import Enum
+from typing import Tuple, Union, List
 
 
-def load_image(image_path: str) -> np.ndarray:
-    return cv2.imread(image_path)
+class Channels(Enum):
+    RED: int = 0
+    GREEN: int = 1
+    BLUE: int = 2
 
 
-def save_image(image: np.ndarray, path: str):
-    cv2.imwrite(path, image)
+def swap_red_and_blue_channels(image: np.ndarray) -> np.ndarray:
+    return image[:, :, ::-1]
+
+
+def get_monochrome_image(image: np.ndarray, channel: Channels) -> np.ndarray:
+    return image[:, :, channel.value]
+
+
+def replace_image_1_center_with_image_2_center(image1: np.ndarray, image2: np.ndarray, center_size) -> np.ndarray:
+    image1_height_center_indices, image1_width_center_indices = get_monochrome_image_center_xy_indices(image1,
+                                                                                                       center_size)
+
+    image2_height_center_indices, image2_width_center_indices = get_monochrome_image_center_xy_indices(image2,
+                                                                                                       center_size)
+    crop2 = image2[image2_height_center_indices[0]:image2_height_center_indices[-1],
+                   image2_width_center_indices[0]:image2_width_center_indices[-1]]
+    image1_copy = image1.copy()
+    image1_copy[image1_height_center_indices[0]:image1_height_center_indices[-1],
+                image1_width_center_indices[0]:image1_width_center_indices[-1]] = crop2
+    return image1_copy
+
+
+def get_monochrome_image_center_xy_indices(image: np.ndarray, size: int = None) -> Union[
+    Tuple[int, int], Tuple[np.ndarray, np.ndarray]]:
+    if len(image.shape) != 2:
+        raise ValueError(f'expected image to be monochrome, but got image of shape {image.shape}')
+    image_height, image_width = image.shape
+    if size is None:
+        return np.ceil(image_height / 2), np.ceil(image_width / 2)
+    else:
+        height_indices = get_interval_from_center(np.ceil(image_height / 2), size=size)
+        width_indices = get_interval_from_center(np.ceil(image_width / 2), size=size)
+        return height_indices, width_indices
+
+
+def get_interval_from_center(center: int, size: int) -> np.ndarray:
+    start = center - np.floor(size / 2)
+    return np.arange(start=start, stop=start + size).astype(int)
