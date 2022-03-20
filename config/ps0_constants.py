@@ -15,6 +15,11 @@ class Image1PathsStorage(NamedTuple):
     ps0_2_b: str = PS0_BASE_OUTPUT_PATH + 'ps0-2-b-1.png'
     ps0_2_c: str = PS0_BASE_OUTPUT_PATH + 'ps0-2-c-1.png'
     ps0_3: str = PS0_BASE_OUTPUT_PATH + 'ps0-3-a-1.png'
+    ps0_4_b: str = PS0_BASE_OUTPUT_PATH + 'ps0-4-b-1.png'
+    ps0_4_c: str = PS0_BASE_OUTPUT_PATH + 'ps0-4-c-1.png'
+    ps0_4_d: str = PS0_BASE_OUTPUT_PATH + 'ps0-4-d-1.png'
+    ps0_5_a: str = PS0_BASE_OUTPUT_PATH + 'ps0-5-a-1.png'
+    ps0_5_b: str = PS0_BASE_OUTPUT_PATH + 'ps0-5-b-1.png'
 
 
 class Image2PathsStorage(NamedTuple):
@@ -24,3 +29,5 @@ class Image2PathsStorage(NamedTuple):
 
 img_1_paths = Image1PathsStorage()
 img_2_paths = Image2PathsStorage()
+
+SIGMA = 10
