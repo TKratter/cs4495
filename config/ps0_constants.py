@@ -1,6 +1,5 @@
-from typing import NamedTuple
-from enum import Enum
 import os
+from typing import NamedTuple
 
 CWD = os.getcwd()
 
