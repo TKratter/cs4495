@@ -1,6 +1,8 @@
-import numpy as np
 from enum import Enum
-from typing import Tuple, Union, List
+from typing import Tuple, Union
+
+import numpy as np
+import cv2
 
 
 class Channels(Enum):
@@ -59,3 +61,11 @@ def add_gaussian_noise_to_chanel(image: np.ndarray, channel: Channels, sigma=flo
     image_copy = image.copy()
     image_copy[:, :, channel.value] += noise
     return image_copy
+
+
+def scale_image_to_range(image: np.ndarray, range_: Tuple[Union[int, float], Union[int, float]]) -> np.ndarray:
+    return ((image - image.min()) / image.ptp()) * (range_[1] - range_[0]) + range_[0]
+
+
+def rgb_to_grayscale(image: np.ndarray) -> np.ndarray:
+    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
