@@ -14,18 +14,17 @@ L = cv2.imread(os.path.join('input', 'pair0-L.png'), 0) * (1.0 / 255.0)  # grays
 R = cv2.imread(os.path.join('input', 'pair0-R.png'), 0) * (1.0 / 255.0)
 
 
-D_L = disparity_ssd(L, R)
-D_R = disparity_ssd(R, L)
-
-save_image(scale_image_to_range(D_L, (0, 200)), img_storage.ps_1_a_1)
-save_image(scale_image_to_range(D_L, (0, 200)), img_storage.ps_1_a_2)
+# D_L = disparity_ssd(L, R)
+# D_R = disparity_ssd(R, L)
+#
+# save_image(scale_image_to_range(D_L, (0, 200)), img_storage.ps_1_a_1)
+# save_image(scale_image_to_range(D_L, (0, 200)), img_storage.ps_1_a_2)
 
 # 2-a
 left_image = rgb_to_grayscale(load_image(image_path=img_storage.pair_1_l))
 right_image = rgb_to_grayscale(load_image(image_path=img_storage.pair_1_r))
 
-disparity_left = disparity_ssd(left_image, right_image)
-disparity_right = disparity_ssd(right_image, left_image)
-
-save_image(scale_image_to_range(disparity_left, (0, 200)), img_storage.ps_2_a_1)
-save_image(scale_image_to_range(disparity_right, (0, 200)), img_storage.ps_2_a_2)
+disparity_left = disparity_ssd(left_image, right_image, max_distance_from_reference=60)
+save_image(disparity_left, img_storage.ps_2_a_1)
+disparity_right = disparity_ssd(right_image, left_image, max_distance_from_reference=60)
+save_image(disparity_right, img_storage.ps_2_a_2)

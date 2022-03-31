@@ -7,8 +7,8 @@ PS2_BASE_OUTPUT_PATH = CWD + '/output/'
 PS2_BASE_INPUT_PATH = CWD + '/input/'
 
 
-TPL_ROWS = 21
-TPL_COLS = 21
+TPL_ROWS = 11
+TPL_COLS = 11
 
 
 class ImagePathStorage(NamedTuple):

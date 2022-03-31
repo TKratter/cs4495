@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import numpy as np
 from tqdm import tqdm
@@ -6,7 +6,8 @@ from tqdm import tqdm
 from config.ps2_constants import TPL_COLS, TPL_ROWS
 
 
-def disparity_ssd(left_mat: np.ndarray, right_mat: np.ndarray) -> np.ndarray:
+def disparity_ssd(left_mat: np.ndarray, right_mat: np.ndarray,
+                  max_distance_from_reference: Optional[int] = None) -> np.ndarray:
     """Compute disparity map D(y, x) such that: L(y, x) = R(y, x + D(y, x))
     
     Params:
@@ -24,20 +25,28 @@ def disparity_ssd(left_mat: np.ndarray, right_mat: np.ndarray) -> np.ndarray:
         for c in range(col_size):
             disparity_matrix[r, c] = calculate_disparity_for_left_reference_point(left_reference_point=(r, c),
                                                                                   left_mat=left_mat,
-                                                                                  right_mat=right_mat)
+                                                                                  right_mat=right_mat,
+                                                                                  max_distance_from_reference=max_distance_from_reference)
 
     return disparity_matrix
 
 
 def calculate_disparity_for_left_reference_point(left_reference_point: Tuple[int, int], left_mat: np.ndarray,
-                                                 right_mat: np.ndarray) -> int:
+                                                 right_mat: np.ndarray,
+                                                 max_distance_from_reference: Optional[int] = None) -> int:
     row_patch_start, row_patch_end, col_patch_start, col_patch_end = get_patch_corners(left_reference_point)
     left_patch = _create_valid_patch(row_patch_start, row_patch_end, col_patch_start, col_patch_end, left_mat)
     right_strip = _create_valid_strip(row_patch_start, row_patch_end, right_mat)
     sliding_window_view = create_sliding_window_view(strip=right_strip)
     squared_differences = (sliding_window_view - left_patch[:, :, np.newaxis]) ** 2
     ssd_array = squared_differences.sum(axis=(0, 1))
-    best_match_column = ssd_array.argmin()
+    if max_distance_from_reference is None:
+        best_match_column = ssd_array.argmin()
+    else:
+        lower_col_limit = np.max((left_reference_point[1] - max_distance_from_reference - TPL_COLS, 0))
+        upper_col_limit = np.min((left_reference_point[1] + max_distance_from_reference + TPL_COLS, ssd_array.size))
+        best_match_column = find_nearest(
+            np.argwhere(ssd_array == ssd_array[lower_col_limit: upper_col_limit].min()), left_reference_point[1])
 
     return left_reference_point[1] - best_match_column
 
@@ -78,7 +87,7 @@ def _create_valid_patch(row_start: int, row_end: int, col_start: int, col_end: i
     patch_row_end = TPL_ROWS - (row_end - valid_row_end)
     patch_col_end = TPL_COLS - (col_end - valid_col_end)
     patch[patch_row_start: patch_row_end, patch_col_start: patch_col_end] = mat[valid_row_start: valid_row_end,
-                                                                                valid_col_start: valid_col_end]
+                                                                            valid_col_start: valid_col_end]
 
     return patch
 
@@ -106,3 +115,8 @@ def _create_valid_strip(row_start: int, row_end: int, mat: np.ndarray):
     patch_row_end = TPL_ROWS - (row_end - valid_row_end)
     strip[patch_row_start: patch_row_end, :] = mat[valid_row_start: valid_row_end, :]
     return strip
+
+
+def find_nearest(array: np.ndarray, value):
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
