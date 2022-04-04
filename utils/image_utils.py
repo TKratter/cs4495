@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Tuple, Union
 
 import numpy as np
+import scipy
 import cv2
 
 
@@ -9,6 +10,11 @@ class Channels(Enum):
     RED: int = 2
     GREEN: int = 1
     BLUE: int = 0
+
+
+class Directions(Enum):
+    X: int = 0
+    Y: int = 1
 
 
 def swap_red_and_blue_channels(image: np.ndarray) -> np.ndarray:
@@ -55,11 +61,19 @@ def normalize_image(image: np.ndarray) -> np.ndarray:
     return (image - image.mean()) / image.std()
 
 
-def add_gaussian_noise_to_chanel(image: np.ndarray, channel: Channels, sigma=float) -> np.ndarray:
+def add_gaussian_noise_to_chanel(image: np.ndarray, channel: Channels, sigma: float) -> np.ndarray:
     image_height, image_width, _ = image.shape
     noise = (np.random.randn(image_height, image_width) * sigma).astype(np.uint8)
     image_copy = image.copy()
     image_copy[:, :, channel.value] += noise
+    return image_copy
+
+
+def add_gaussian_noise(image: np.ndarray, sigma: float) -> np.ndarray:
+    image_height, image_width = image.shape
+    noise = (np.random.randn(image_height, image_width) * sigma).astype(np.uint8)
+    image_copy = image.copy()
+    image_copy += noise
     return image_copy
 
 
@@ -69,3 +83,13 @@ def scale_image_to_range(image: np.ndarray, range_: Tuple[Union[int, float], Uni
 
 def rgb_to_grayscale(image: np.ndarray) -> np.ndarray:
     return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+
+def joined_image_gradients(image: np.ndarray) -> np.ndarray:
+    dx = directioned_gradient_image(image, Directions.X)
+    dy = directioned_gradient_image(image, Directions.Y)
+    return np.hstack((dx, dy))
+
+
+def directioned_gradient_image(image: np.ndarray, direction: Directions) -> np.ndarray:
+    return np.gradient(image, axis=direction.value)

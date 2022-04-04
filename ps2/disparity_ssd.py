@@ -1,4 +1,4 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Callable
 
 import numpy as np
 from tqdm import tqdm
@@ -17,17 +17,23 @@ def disparity_ssd(left_mat: np.ndarray, right_mat: np.ndarray,
     Returns: Disparity map, same size as L, R
     """
 
+    disparity_matrix = disparity_by_callable(match_func=calculate_disparity_for_left_reference_point, left_mat=left_mat,
+                                             right_mat=right_mat,
+                                             max_distance_from_reference=max_distance_from_reference)
+
+    return disparity_matrix
+
+
+def disparity_by_callable(match_func: Callable, left_mat: np.ndarray, right_mat: np.ndarray,
+                          max_distance_from_reference: Optional[int] = None) -> np.ndarray:
     row_size, col_size = left_mat.shape
-
     disparity_matrix = np.zeros((row_size, col_size))
-
     for r in tqdm(range(row_size)):
         for c in range(col_size):
-            disparity_matrix[r, c] = calculate_disparity_for_left_reference_point(left_reference_point=(r, c),
-                                                                                  left_mat=left_mat,
-                                                                                  right_mat=right_mat,
-                                                                                  max_distance_from_reference=max_distance_from_reference)
-
+            disparity_matrix[r, c] = match_func(left_reference_point=(r, c),
+                                                left_mat=left_mat,
+                                                right_mat=right_mat,
+                                                max_distance_from_reference=max_distance_from_reference)
     return disparity_matrix
 
 
