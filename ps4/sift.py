@@ -29,9 +29,8 @@ def plot_angle_for_interest_points(image: np.ndarray, save_path: Optional[str] =
         plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
 
 
-def plot_matching_points_in_images(image1: np.ndarray, image2: np.ndarray, save_path: Optional[str] = None,
-                                   **sift_params):
-    point_pairs = get_matching_points_in_images(image1, image2, **sift_params)
+def plot_matching_points_in_images(image1: np.ndarray, image2: np.ndarray, save_path: Optional[str] = None):
+    point_pairs = get_matching_points_in_images(image1, image2)
     joined_image = np.hstack((image1, image2))
     plt.figure()
     plt.imshow(joined_image)
@@ -48,10 +47,10 @@ def plot_matching_points_in_images(image1: np.ndarray, image2: np.ndarray, save_
         plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
 
 
-def get_matching_points_in_images(image1: np.ndarray, image2: np.ndarray, topk_matches=40, **sift_params) -> List[
+def get_matching_points_in_images(image1: np.ndarray, image2: np.ndarray, topk_matches=40) -> List[
     Tuple[np.ndarray, np.ndarray]]:
-    points1, descriptors1 = compute_sift_descriptors(image1, **sift_params)
-    points2, descriptors2 = compute_sift_descriptors(image2, **sift_params)
+    points1, descriptors1 = compute_sift_descriptors(image1)
+    points2, descriptors2 = compute_sift_descriptors(image2)
     bfm = cv2.BFMatcher(crossCheck=True)
     matches = bfm.match(descriptors1, descriptors2)
     matches = sorted(matches, key=lambda x: x.distance)
@@ -73,8 +72,8 @@ def get_matching_points_in_images(image1: np.ndarray, image2: np.ndarray, topk_m
     return point_pairs
 
 
-def compute_sift_descriptors(image: np.ndarray, **sift_params):
-    sift = cv2.xfeatures2d.SIFT_create(**sift_params)
+def compute_sift_descriptors(image: np.ndarray):
+    sift = cv2.xfeatures2d.SIFT_create()
     points = get_cv2_keypoints_list_from_image(image)
     points, descriptors = sift.compute(image, points)
     return points, descriptors
@@ -102,8 +101,8 @@ def compute_angles(image: np.ndarray) -> np.ndarray:
     return angles
 
 
-def find_translation_consensus(image1: np.ndarray, image2: np.ndarray, **sift_params):
-    point_pairs = get_matching_points_in_images(image1, image2, **sift_params)
+def find_translation_consensus(image1: np.ndarray, image2: np.ndarray):
+    point_pairs = get_matching_points_in_images(image1, image2)
 
     (p1, p2), mean_translation = ransac_translation(point_pairs)
     height2, width2, _ = image2.shape

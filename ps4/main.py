@@ -38,16 +38,11 @@ sim_b = load_image(img_storage.sim_b)
 # plot_angle_for_interest_points(sim_a, save_path=img_storage.ps_2_a_2)
 
 # 2-b
-sift_params = {
-    'nfeatures': 6,
-    'nOctaveLayers': 4,
-    'contrastThreshold': 1.,
-    'edgeThreshold': 1e-4,
-    'sigma': 4
-}
-plot_matching_points_in_images(trans_a, trans_b, **sift_params)
-# plot_matching_points_in_images(trans_a, trans_b, save_path=img_storage.ps_2_b_1, **sift_params)
+
+
+plot_matching_points_in_images(trans_a, trans_b)
+# plot_matching_points_in_images(trans_a, trans_b, save_path=img_storage.ps_2_b_1)
 # plot_matching_points_in_images(sim_a, sim_b, save_path=img_storage.ps_2_b_2)
 
 # 2-c
-find_translation_consensus(trans_a, trans_b, **sift_params)
+find_translation_consensus(trans_a, trans_b)
