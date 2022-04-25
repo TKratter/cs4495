@@ -1,14 +1,15 @@
 import numpy as np
 
-from config.ps4_constants import THRESHOLD_VALUE, NMP_RADIUS
+from config.ps4_constants import THRESHOLD_VALUE, nms_RADIUS
 from utils.image_utils import directioned_gradient_image, Directions, rgb_to_grayscale
 from scipy import signal
 from tqdm import tqdm
 import numba
+import scipy.ndimage.filters as filters
 
 
 def image_to_harris_values_matrix(image: np.ndarray, window: np.ndarray, alpha: float,
-                                  threshold: bool = False, nmp: bool = False) -> np.ndarray:
+                                  threshold: bool = False, nms: bool = False) -> np.ndarray:
     if len(image.shape) == 3:
         image = rgb_to_grayscale(image)
     i_x = directioned_gradient_image(image, Directions.X)
@@ -28,10 +29,11 @@ def image_to_harris_values_matrix(image: np.ndarray, window: np.ndarray, alpha: 
     if threshold:
         harris_values[harris_values < THRESHOLD_VALUE] = 0
 
-    if nmp:
+    if nms:
         harris_values = non_maximal_suppression(harris_values)
 
     return harris_values
+
 
 @numba.njit
 def harris_matrixes_to_values_matrix(harris_matrixes: np.ndarray, alpha: float) -> np.ndarray:
@@ -54,8 +56,9 @@ def moment_matrix_to_harris_value(matrix: np.ndarray, alpha: float) -> float:
     return lambda1 * lambda2 - alpha * (lambda1 + lambda2) ** 2
 
 
-def non_maximal_suppression(harris_values: np.ndarray, radius: int = NMP_RADIUS) -> np.ndarray:
-    local_maxima_indices = signal.argrelmax(harris_values, order=radius)
+def non_maximal_suppression(harris_values: np.ndarray, radius: int = nms_RADIUS) -> np.ndarray:
+    local_maxima_indices = np.argwhere((harris_values * 1.01 - filters.maximum_filter(harris_values, size=radius)) > 0)
+    local_maxima_indices = list(zip(*local_maxima_indices))
     new_harris_values = np.zeros(harris_values.shape)
     new_harris_values[local_maxima_indices] = harris_values[local_maxima_indices]
     return new_harris_values

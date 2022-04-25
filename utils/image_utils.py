@@ -93,3 +93,9 @@ def joined_image_gradients(image: np.ndarray) -> np.ndarray:
 
 def directioned_gradient_image(image: np.ndarray, direction: Directions) -> np.ndarray:
     return np.gradient(image, axis=direction.value)
+
+
+def translate_image(image: np.ndarray, x_direction: int, y_direction: int) -> np.ndarray:
+    translation_image = np.float32([[1, 0, x_direction], [0, 1, y_direction]])
+    img_translation = cv2.warpAffine(image, translation_image, image.shape[:2][::-1])
+    return img_translation
