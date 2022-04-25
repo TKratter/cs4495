@@ -28,6 +28,7 @@ class ImagePathStorage(NamedTuple):
     ps_2_a_2: str = PS4_BASE_OUTPUT_PATH + 'ps4-2-a-2.png'
     ps_2_b_1: str = PS4_BASE_OUTPUT_PATH + 'ps4-2-b-1.png'
     ps_2_b_2: str = PS4_BASE_OUTPUT_PATH + 'ps4-2-b-2.png'
+    ps_3_a_1: str = PS4_BASE_OUTPUT_PATH + 'ps4-3-a-1.png'
     debug_input: str = PS4_DEBUG_PATH + 'red_star.png'
     debug_input_translated: str = PS4_DEBUG_PATH + 'red_star_translated.png'
     debug_image_angles: str = PS4_DEBUG_PATH + 'red_star_angles.png'

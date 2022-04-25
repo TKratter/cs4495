@@ -40,9 +40,10 @@ sim_b = load_image(img_storage.sim_b)
 # 2-b
 
 
-plot_matching_points_in_images(trans_a, trans_b)
 # plot_matching_points_in_images(trans_a, trans_b, save_path=img_storage.ps_2_b_1)
 # plot_matching_points_in_images(sim_a, sim_b, save_path=img_storage.ps_2_b_2)
 
-# 2-c
-find_translation_consensus(trans_a, trans_b)
+# 3-a
+find_translation_consensus(trans_a, trans_b, plot=True, save_path=img_storage.ps_3_a_1)
+
+

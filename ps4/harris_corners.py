@@ -41,9 +41,9 @@ def harris_matrixes_to_values_matrix(harris_matrixes: np.ndarray, alpha: float) 
 
     values_matrix = np.zeros((height, width))
 
-    for x in range(height):
-        for y in range(width):
-            values_matrix[x, y] = moment_matrix_to_harris_value(matrix=harris_matrixes[x, y, :, :], alpha=alpha)
+    for i in range(height):
+        for j in range(width):
+            values_matrix[i, j] = moment_matrix_to_harris_value(matrix=harris_matrixes[i, j, :, :], alpha=alpha)
     return values_matrix
 
 
